@@ -10,9 +10,6 @@ export const generateRewardsData = (input: Transaction[]): RewardEntry[] => {
     let reward: Record<string, RewardData> = {};
 
     input.forEach((transaction) => {
-        /**Assuming we know the month this transaction is from,
-         * {"123": {totalReward:5,jun:0, jul:0, aug:5}}
-         */
 
         let transactionMonth = getMonthFromTimestamp(transaction.date);
 
@@ -28,18 +25,7 @@ export const generateRewardsData = (input: Transaction[]): RewardEntry[] => {
                     currentReward;
             }
         } else {
-            /**
-             * when the userId does not exist, we create a new userID in reward
-             * There current reward is the total reward because this is the first
-             * transaction we encounter with this ID.
-             *
-             * The transaction month is the only month in this transaction
-             * with this user. There is only one reward so it goes in this month.
-             *
-             * Because this is the first time we encounter this user,
-             * the total reward is also the reward for this month.
-             *
-             */
+
             reward[transaction.userId] = {
                 totalReward: currentReward,
                 monthRewards: { [transactionMonth]: currentReward },
@@ -52,10 +38,7 @@ export const generateRewardsData = (input: Transaction[]): RewardEntry[] => {
             JSON.stringify(reward, null, 2)
         );
     });
-    /**
-     *[{userId:123, totalReward: 5, jun:0, jul:0, aug:5},{}]
-     *
-     */
+
     for (let userId in reward) {
         res.push({
             userId,

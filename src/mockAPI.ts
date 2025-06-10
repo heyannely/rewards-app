@@ -33,21 +33,6 @@ const customerTransactions: Transaction[] = [
     { id: "29", userId: "123", amount: 157, date: 1717545600000 },
 ];
 
-/* const totalRewards:Re = [
-    {
-      totalPoints: 0,
-      userId: "123"
-    },
-    {
-      totalPoints: 0,
-      userId: "523"
-    },
-    {
-      totalPoints: 0,
-      userId: "342"
-    }
-  ] */
-
 export function mockAPI(
     shouldFail: boolean = false,
     delay: number = 1000

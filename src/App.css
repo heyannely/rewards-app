@@ -13,7 +13,7 @@ h2 {
 
 .reward--container {
   display: flex;
-  flex-direction: row; /* changed from column */
+  flex-direction: row; 
   gap: 20px;
   align-items: flex-start;
   padding: 40px;
@@ -27,13 +27,13 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center; /* centers contents horizontally */
+  align-items: center; 
   gap: 16px;
 }
 
 table {
   border-collapse: collapse;
-  width: 100%; /* full width of column */
+  width: 100%; 
 }
 
 table th,
