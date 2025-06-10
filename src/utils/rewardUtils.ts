@@ -113,3 +113,10 @@ export const getMonthStringList = (
         (a, b) => monthStringMap[a] - monthStringMap[b]
     ) as [string, string, string];
 };
+
+export const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(value);
