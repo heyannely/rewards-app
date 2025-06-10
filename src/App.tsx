@@ -1,34 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import { mockAPI } from './mockAPI'
 import './App.css'
+import type { Input, Output } from './types/reward.type'
+import { calculateRewards } from './utils/rewardUtils'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [transactions, setTransactions] = useState<Input>([])
+  const [rewards, setRewards] = useState<Output>([])
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await mockAPI(false, 1500);
+        setTransactions(res.data)
+      } catch (err: any) {
+        console.log(err, "error")
+      }
+    };
+    fetchUser();
+  }, [])
+
+  const handleCalculateRewards = () => {
+    setRewards(calculateRewards(transactions))
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>UserID</th>
+            <th>Amount</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((tx) => {
+            const date = new Date(tx.date)
+            const readableDate = date.toLocaleDateString();
+            return <tr key={tx.id}>
+              <td>{tx.id}</td>
+              <td>{tx.userId}</td>
+              <td>{tx.amount}</td>
+              <td>{readableDate}</td>
+            </tr>
+          })}
+        </tbody>
+      </table>
+
+      <button onClick={handleCalculateRewards}>Calculate Rewards</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Total Rewards</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rewards.map((reward)=>(<tr key={reward.userId}>
+            <td>{reward.userId}</td>
+            <td>{reward.totalPoints}</td>
+          </tr>))}
+
+        </tbody>
+      </table>
+    </div>
   )
 }
 
