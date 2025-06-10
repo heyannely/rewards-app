@@ -1,79 +1,115 @@
-import type { Input, Output, RewardData } from "../types/reward.type";
+import type {
+    RewardData,
+    RewardEntry,
+    Transaction,
+} from "../types/reward.type";
 
-export const generateRewardsData = (input:Input): Output => {
+export const generateRewardsData = (input: Transaction[]): RewardEntry[] => {
+    let res: RewardEntry[] = [];
 
-    let res:Output = [];
-  
-    let reward:{[id:string]:{totalReward: number, [month:string]:number}} = {};
-  
-    input.forEach((transaction)=>{
-      /**Assuming we know the month this transaction is from,
-       * {"123": {totalReward:5,jun:0, jul:0, aug:5}}
-      */
+    let reward: Record<string, RewardData> = {};
 
-      let transactionMonth = getMonthFromTimestamp(transaction.date)
-
-      const currentReward = calculateReward(transaction.amount)
-
-      if(transaction.userId in reward){
-        reward[transaction.userId].totalReward += currentReward;
-        if(transactionMonth in reward[transaction.userId]){
-          reward[transaction.userId][transactionMonth] += currentReward;
-        } else {
-          reward[transaction.userId][transactionMonth] = currentReward;
-        }
-
-      } else {
-        /**
-         * when the userId does not exist, we create a new userID in reward
-         * There current reward is the total reward because this is the first
-         * transaction we encounter with this ID. 
-         * 
-         * The transaction month is the only month in this transaction
-         * with this user. There is only one reward so it goes in this month.
-         * 
-         * Because this is the first time we encounter this user,
-         * the total reward is also the reward for this month.
-         * 
+    input.forEach((transaction) => {
+        /**Assuming we know the month this transaction is from,
+         * {"123": {totalReward:5,jun:0, jul:0, aug:5}}
          */
-        reward[transaction.userId] = {
-          totalReward:currentReward, 
-          [transactionMonth]: currentReward
-        };
-      }
 
-    })
-  /**
-   *[{userId:123, totalReward: 5, jun:0, jul:0, aug:5},{}]
-   * 
-   */
-    for(let userId in reward){
-      res.push({
-        userId, 
-        totalReward: number, 
-        monthRewards:{[month:string]:number }
-      })
+        let transactionMonth = getMonthFromTimestamp(transaction.date);
+
+        const currentReward = calculateReward(transaction.amount);
+
+        if (transaction.userId in reward) {
+            reward[transaction.userId].totalReward += currentReward;
+            if (transactionMonth in reward[transaction.userId].monthRewards) {
+                reward[transaction.userId].monthRewards[transactionMonth] +=
+                    currentReward;
+            } else {
+                reward[transaction.userId].monthRewards[transactionMonth] =
+                    currentReward;
+            }
+        } else {
+            /**
+             * when the userId does not exist, we create a new userID in reward
+             * There current reward is the total reward because this is the first
+             * transaction we encounter with this ID.
+             *
+             * The transaction month is the only month in this transaction
+             * with this user. There is only one reward so it goes in this month.
+             *
+             * Because this is the first time we encounter this user,
+             * the total reward is also the reward for this month.
+             *
+             */
+            reward[transaction.userId] = {
+                totalReward: currentReward,
+                monthRewards: { [transactionMonth]: currentReward },
+            };
+        }
+        console.log(
+            transaction.userId,
+            transaction.amount,
+            currentReward,
+            JSON.stringify(reward, null, 2)
+        );
+    });
+    /**
+     *[{userId:123, totalReward: 5, jun:0, jul:0, aug:5},{}]
+     *
+     */
+    for (let userId in reward) {
+        res.push({
+            userId,
+            ...reward[userId],
+        });
     }
-  
+
     return res;
-  }
+};
 
-const getMonthFromTimestamp = (timestamp:number) : string => {
-  const date = new Date(timestamp);
-  const monthString = date.toLocaleString('default', {month: 'short',});
-  return monthString
-}
-const calculateReward = (amt:number) : number => {
-
+const getMonthFromTimestamp = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    const monthString = date.toLocaleString("default", { month: "short" });
+    return monthString;
+};
+const calculateReward = (amt: number): number => {
     let totalBonus = 0;
-  
-    if(amt > 100){
-      totalBonus = ((amt - 100) * 2)+ 50
-    } else if (amt > 50 && amt <= 100){
-      totalBonus = amt - 50 
+
+    if (amt > 100) {
+        totalBonus = (amt - 100) * 2 + 50;
+    } else if (amt > 50 && amt <= 100) {
+        totalBonus = amt - 50;
     } else {
-      totalBonus = 0
+        totalBonus = 0;
     }
-  
+
     return totalBonus;
-  }
+};
+
+const monthStringMap: Record<string, number> = {
+    Jan: 1,
+    Feb: 2,
+    Mar: 3,
+    Apr: 4,
+    May: 5,
+    Jun: 6,
+    Jul: 7,
+    Aug: 8,
+    Sep: 9,
+    Oct: 10,
+    Nov: 11,
+    Dec: 12,
+};
+
+export const getMonthStringList = (
+    transactions: Transaction[]
+): [string, string, string] => {
+    const monthSet = new Set<string>();
+    transactions.forEach((transaction) => {
+        const monthString = getMonthFromTimestamp(transaction.date);
+        monthSet.add(monthString);
+    });
+
+    return Array.from(monthSet).sort(
+        (a, b) => monthStringMap[a] - monthStringMap[b]
+    ) as [string, string, string];
+};

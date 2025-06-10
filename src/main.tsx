@@ -1,30 +1,25 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+createRoot(document.getElementById("root")!).render(<App />);
 
 /**
- * 
+ *
  * Input: all transactions in a 3-month period
  * Output: All reward points for each customer
  * *
- * 
- * string, number, boolean, 
- * 
+ *
+ * string, number, boolean,
+ *
  * array: repetitive item,  same type
  * object: single item
- * 
+ *
  * If 1 transaction happen in Janurary, then there should not be another transaction happen in July
  */
 
-
-  /**
+/**
    * 
    *  Input is an array of transactions.
    * 
@@ -42,9 +37,6 @@ createRoot(document.getElementById('root')!).render(
     "523": 5,
   };
    */
-
-
-
 
 // console.log(JSON.stringify(calculateRewards(customerTransactions)) === JSON.stringify(totalRewards))
 // console.log(calculateRewards(customerTransactions), totalRewards)
